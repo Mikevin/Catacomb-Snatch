@@ -72,7 +72,7 @@ public class Harvester extends Building implements LootCollector {
         --harvestingTicks;
         isHarvesting = (harvestingTicks >= 0);
 
-        Random random = new Random();
+        Random random = TurnSynchronizer.synchedRandom;
         if (isHarvesting) {
             if (random.nextDouble() < 0.050f) {
                 level.addEntity(new SmokeAnimation(pos.x - 6 + random.nextInt(8) - random.nextInt(8), pos.y - 16, Art.fxSteam12, 30));
@@ -82,7 +82,11 @@ public class Harvester extends Building implements LootCollector {
                 level.addEntity(new SmokeAnimation(pos.x - 6 + random.nextInt(8) - random.nextInt(8), pos.y - 16, Art.fxSteam12, 30));
             }
         }
-    }
+		
+		if (health == 0) {
+		dropAllMoney();
+        }
+	}
 
     @Override
     public Bitmap getSprite() {
@@ -137,10 +141,6 @@ public class Harvester extends Building implements LootCollector {
         } else {
             screen.blit(image, pos.x - image.w / 2, pos.y - image.h + 8);
         }
-
-        if (health == 0) {
-            dropAllMoney();
-        }
     }
 
     public void take(Loot loot) {
@@ -162,7 +162,7 @@ public class Harvester extends Building implements LootCollector {
     public void dropAllMoney() {
 
         while (money > 0) {
-            double dir = new Random().nextDouble() * Math.PI * 2;
+            double dir = TurnSynchronizer.synchedRandom.nextDouble() * Math.PI * 2;
             Loot loot = new Loot(pos.x, pos.y, Math.cos(dir), Math.sin(dir), money / 2);
             level.addEntity(loot);
 
